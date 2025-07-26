@@ -21,9 +21,9 @@ socket.addEventListener('message', (event) => {
     }
 });
 
-function sendToTwitch(text) {
-    const response = `PRIVMSG ${channel} :${text}`;
-    socket.send(response);
+function sendToTwitch(text, user) {
+    socket.send(`PRIVMSG ${channel} :${text}`);
+    socket.send(`PRIVMSG ${channel} :${user} requested: ${text}`);
 }
 
 module.exports = { sendToTwitch }; // make sure that njs doesnt have a mental breakdown when i try to use this in the request file

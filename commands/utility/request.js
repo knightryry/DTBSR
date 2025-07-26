@@ -14,10 +14,20 @@ module.exports = {
                 .setRequired(true)),
     // fuck async
 	async execute(interaction) {
+        // grab the bsr code the user requested
         const bsrCode = interaction.options.getString('bsr');
-        // i LOVE IRC so much here, its so easy
-        // This is stupid, why can't i just use the options to make the message ephemeral oh well, doesnt really matter.
-		sendToTwitch('!bsr ' + bsrCode); // Send the request to Twitch chat
-        await interaction.reply({ content: 'Sent !bsr ' + bsrCode + ' to requests', ephemeral: true });
+        // grab the discord @ of the person who requested it
+        const user = `@${interaction.user.username}`;
+
+        if (bsrCode.startsWith('!bsr ')) {
+            await interaction.reply({ content: 'Please remove "!bsr" from the beginning!', ephemeral: true });
+        }
+        else {
+            // i LOVE IRC so much here, its so easy
+            // note from future, you jinxed your self.
+            // This is stupid, why can't i just use the options to make the message ephemeral oh well, doesnt really matter.
+		    sendToTwitch('!bsr ' + bsrCode, user); // Send the request to Twitch chat
+            await interaction.reply({ content: 'Sent !bsr ' + bsrCode + ' to requests', ephemeral: true });
+        }
 	},
 };
