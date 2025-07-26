@@ -1,6 +1,6 @@
 // I only need to run this shitty code once, so whatever.
 const { REST, Routes } = require('discord.js');
-const { clientId, token } = require('./config.json');
+const { clientId, token, guildId } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -34,16 +34,23 @@ const rest = new REST().setToken(token);
 	try {
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-			Routes.applicationCommands(clientId),
-			{ body: commands },
-		);
-
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		let data;
+		if (guildId) {
+			// Deploy to a specific guild for instant updates
+			data = await rest.put(
+				Routes.applicationGuildCommands(clientId, guildId),
+				{ body: commands },
+			);
+			console.log(`Successfully reloaded ${data.length} guild application (/) commands.`);
+		}
+			// Deploy globally (may take up to 1 hour)
+			data = await rest.put(
+				Routes.applicationCommands(clientId),
+				{ body: commands },
+			);
+			console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
 	}
-    // uncatched errors, more like unhandled errors, i dont care about these, if it fails it fails. not like ima run this again.
-    catch (error) {
+	catch (error) {
 		console.error(error);
 	}
 })();

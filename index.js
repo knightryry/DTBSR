@@ -18,6 +18,7 @@ client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
+// this looks at what commands we have
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -32,7 +33,7 @@ for (const folder of commandFolders) {
 		}
 	}
 }
-
+// this is a lie, as we only log on at the end of the file, but whatever, its fine.
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
@@ -40,6 +41,8 @@ client.once(Events.ClientReady, readyClient => {
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 	const command = interaction.client.commands.get(interaction.commandName);
+
+	console.log('Interaction received:', interaction.commandName); // Log every interaction
 
 	if (!command) {
 		console.error(`No command matching ${interaction.commandName} was found.`);
