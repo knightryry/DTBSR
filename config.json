@@ -1,0 +1,9 @@
+{
+    "token": "YOUR TOKEN HERE",
+    "clientId": "YOUR DISCORD BOT CLIENT ID HERE",
+    "main": "index.js",
+    "twitch_oauth": "YOUR TWITCH OAUTH CODE HERE",
+    "twitch_nick": "YOUR TWITCH CHANNEL",
+    "twitch_channel": "#YOUR TWITCH CHANNEL... AGAIN"
+    "_comment": "make sure to keep the # in the one above. you can delete this message if you want"
+}
