@@ -64,11 +64,6 @@ module.exports = {
         if (interaction.options.getSubcommand() === 'search') {
             const searchTerm = interaction.options.getString('query');
             const user = `@${interaction.user.username}`;
-            const chroma = interaction.options.getBoolean('chroma');
-            const vivify = interaction.options.getBoolean('vivify');
-            const noodle = interaction.options.getBoolean('noodle');
-            const mappingextensions = interaction.options.getBoolean('mappingextensions');
-            let finalBsrCode = null;
             let mapTitle = null;
             let mapAuthor = null;
             let mapKey = null;
@@ -79,39 +74,18 @@ module.exports = {
                     'https://api.beatsaver.com/search/text/0',
                     { params: { q: searchTerm }, timeout: 4000 },
                 );
-                let maps = response.data.docs;
+                const maps = response.data.docs;
                 if (!maps || maps.length === 0) {
                     await interaction.reply({ content: `No maps found for "${searchTerm}".`, ephemeral: true });
                     return;
                 }
 
-                // Exclude automapper songs, because we hate Ai.
-                maps = maps.filter(map => !(map.automapper === true || (map.metadata && map.metadata.automapper === true)));
+                // so turns out i have no fucking idea how to do filters, so were not gonna have it for now. im going insane its almost 4 in the morning
+                // also i spent an hour trying to figure out why it kept giving me an API error, turns out i forgot to remove the stupid broken filter stuff AGAIN.
 
-                // filters: pt.2
-                if (chroma) {
-                    maps = maps.filter(map => map.versions && map.versions.some(v => v.diffs && v.diffs.some(d => d.requirements && d.requirements.includes('Chroma'))));
-                }
-                // vivify my beloved
-                if (vivify) {
-                    maps = maps.filter(map => map.versions && map.versions.some(v => v.diffs && v.diffs.some(d => d.requirements && d.requirements.includes('Vivify'))));
-                }
-                if (noodle) {
-                    maps = maps.filter(map => map.versions && map.versions.some(v => v.diffs && v.diffs.some(d => d.requirements && d.requirements.includes('Noodle Extensions'))));
-                }
-                if (mappingextensions) {
-                    maps = maps.filter(map => map.versions && map.versions.some(v => v.diffs && v.diffs.some(d => d.requirements && d.requirements.includes('Mapping Extensions'))));
-                }
-                if (!maps || maps.length === 0) {
-                    await interaction.reply({ content: 'No maps found for your search and selected mod filters.', ephemeral: true });
-                    return;
-                }
-                // do this by rating and grab the bsr code
+                // do this by user rating (not star) and grab the bsr code
                 maps.sort((a, b) => (b.stats.score || 0) - (a.stats.score || 0));
                 const topMap = maps[0];
-                // shut up eslint please :pray:
-                /* eslint-disable-next-line */
-                finalBsrCode = topMap.id;
                 mapTitle = topMap.name;
                 mapAuthor = topMap.metadata && topMap.metadata.levelAuthorName ? topMap.metadata.levelAuthorName : 'Unknown';
                 mapKey = topMap.id;
@@ -159,9 +133,19 @@ module.exports = {
             }
             // catch dem errors :p
             catch (err) {
+                console.error('BeatSaver API error:', err);
                 let msg = 'Error searching BeatSaver API.';
                 if (err.response && err.response.status === 500) {
                     msg += ' Error 500. BeatSaver may currently experiencing issues. Try again later.';
+                }
+                else if (err.response && err.response.data) {
+                    msg += ` (Status: ${err.response.status}) ${JSON.stringify(err.response.data)}`;
+                }
+                else if (err.code === 'ECONNABORTED') {
+                    msg += ' (Timeout)';
+                }
+                else if (err.message) {
+                    msg += ` (${err.message})`;
                 }
                 await interaction.reply({ content: msg, ephemeral: true });
             }
