@@ -27,7 +27,7 @@ module.exports = {
                 .setDescription('Search for a Beat Saber map by name (returns highest rated)')
                 .addStringOption(option =>
                     option.setName('query')
-                        .setDescription('Search for a Beat Saber map by name')
+                        .setDescription('Search for a BeatSaber map by name')
                         .setRequired(true),
                 )
                 .addBooleanOption(option =>
@@ -42,6 +42,10 @@ module.exports = {
                     option.setName('noodle')
                         .setDescription('Require Noodle Extensions support? (Only use if you know what youre doing.)'),
                 )
+                .addIntegerOption(option =>
+                    option.setName('leaderboard')
+                        .setDescription('Blank for all, 1 for ranked, 2 for BL ranked, 3 for SS ranked'),
+                )
                 .addBooleanOption(option =>
                     option.setName('mappingextensions')
                         .setDescription('Require Mapping Extensions support? (Only use if you know what youre doing.)'),
@@ -55,9 +59,16 @@ module.exports = {
             const bsrCode = interaction.options.getString('code');
             const user = `@${interaction.user.username}`;
             if (bsrCode.startsWith('!bsr ')) {
-                await interaction.reply({ content: 'Please remove "!bsr" from the beginning!', ephemeral: true });
-                return;
+                bsrCode = bsrCode.slice(5);
             }
+            
+            if (bsrCode === '25f') {
+                if (Math.random() < 0.5)  {
+                await interaction.reply({ content: 'nice try (i dare you to try again)', ephemeral: true });
+                return;
+                }
+            }
+
             // twitch time for people who know how the system works
             sendToTwitch('!bsr ' + bsrCode, user);
             await interaction.reply({ content: `Sent !bsr ${bsrCode} to requests`, ephemeral: true });
@@ -66,16 +77,32 @@ module.exports = {
         if (interaction.options.getSubcommand() === 'search') {
             const searchTerm = interaction.options.getString('query');
             const user = `@${interaction.user.username}`;
+            const leaderboardFilter = interaction.options.getInteger('leaderboard');
             let mapTitle = null;
             let mapAuthor = null;
             let mapKey = null;
             let mapUrl = null;
+            let lb = null;
+
+            if (!(leaderboardFilter)) {
+                lb = "All";
+            }
+            else if (leaderboardFilter && ![null, 1, 2, 3] .includes(leaderboardFilter)) {
+                await interaction.reply({ content: 'Invalid leaderboard filter. Please choose 1 for ranked, 2 for BeatLeader ranked, or 3 for ScoreSaber ranked.', ephemeral: true });
+                return;
+            }else if (leaderboardFilter === 1) {
+                lb = "Ranked";
+            }else if (leaderboardFilter === 2) {
+                lb = "BeatLeader";
+            }else if (leaderboardFilter === 3) {
+                lb = "ScoreSaber";
+            }
 
             // turns out with the filters i just completely forgot to add it to the request lol
             try {
                 const response = await axios.get(
                     'https://api.beatsaver.com/search/text/0',
-                    { params: { q: searchTerm, chroma: interaction.options.getBoolean('chroma'), vivify: interaction.options.getBoolean('vivify'), noodle: interaction.options.getBoolean('noodle'), mappingextensions: interaction.options.getBoolean('mappingextensions') }, timeout: 4000 },
+                    { params: { q: searchTerm, chroma: interaction.options.getBoolean('chroma'), vivify: interaction.options.getBoolean('vivify'), noodle: interaction.options.getBoolean('noodle'), mappingextensions: interaction.options.getBoolean('mappingextensions'), leaderboard: lb}, timeout: 4000 },
                 );
                 const maps = response.data.docs;
                 if (!maps || maps.length === 0) {
@@ -96,6 +123,18 @@ module.exports = {
                 mapKey = topMap.id;
                 mapUrl = `https://beatsaver.com/maps/${mapKey}`;
 
+                // Extract difficulty information with star ratings
+                let difficultiesInfo = '';
+                if (topMap.versions && topMap.versions.length > 0 && topMap.versions[0].diffs) {
+                    const diffs = topMap.versions[0].diffs;
+                    diffs.forEach(diff => {
+                        const difficulty = diff.difficulty;
+                        const ssStars = diff.stars !== undefined ? diff.stars.toFixed(2) : 'N/A';
+                        const blStars = diff.blStars !== undefined ? diff.blStars.toFixed(2) : 'N/A';
+                        difficultiesInfo += `**${difficulty}**: :star:${ssStars} (ScoreSaber) | :star:${blStars} (BeatLeader)\n`;
+                    });
+                }
+
                 // give the user the choice to see if its the right one, or if they majorly fucked up their search.
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
@@ -109,7 +148,7 @@ module.exports = {
                 );
                 // give the user their one warning
                 await interaction.reply({
-                    content: `**Top Result:**\nTitle: ${mapTitle}\nAuthor: ${mapAuthor}\nBSR: ${mapKey}\n[View on BeatSaver](${mapUrl})\n\nDo you want to send this request to Twitch?`,
+                    content: `**Top Result:**\nTitle: ${mapTitle}\nAuthor: ${mapAuthor}\nBSR: ${mapKey}\n[View on BeatSaver](${mapUrl})\n\n**Difficulties:**\n${difficultiesInfo}\nDo you want to send this request?`,
                     components: [row],
                     ephemeral: true,
                     fetchReply: true
