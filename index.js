@@ -5,7 +5,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
-const { token } = require('./config.json');
+const token = process.env.token;
 // why the hell do i have to import this here, i dont even use it in this file, but everything breaks if i dont, so here it will stay.
 // also PLEASE shut up eslint, i know this is a stupid import, but i need it to make the twitch requests work.
 // eslint-disable-next-line no-unused-vars

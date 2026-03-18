@@ -7,7 +7,18 @@ I actually made this so i can have my friends be able to send beat saber song re
 ### How does this actually work?
 It takes the one command that matters (/request) and sends a message in the twitch chat of YOUR CHOICE and sending the appropate !bsr command. Are there better ways to do this? Absolutly. Am I too lazy to actually do the hard thing to make it nicer? Also yes.
 
-### How do I install it?
-Hell if i know. I'll make a tutorial soon. I just wanted to get my code uploaded.
-#
-# --- MORE INFO SOON---
+### How do I use this?
+Install [Node.js](https://nodejs.org/en/download) 
+Download the source code by clicking `Code` at the top and then clicking `Download Zip`  
+Extract the folder and go into it  
+Rename `template.env` to `.env` and then open it in a text editor, fill out all the credentials.  
+- For the `token` and `clientId`, follow a bot creation guide for Discord and do the same things, make sure the bot is in the discord server of your choice.  
+- `twitch_channel` and `twitch_nick` will just be your twitch username  
+- For `twitch_oauth` go to [this site](https://antiscuff.com/oauth/), login with twitch and use that.  
+
+Open the folder in a terminal and run `npm start` - the Discord bot should start.  
+
+Profit!!! Use `/request` to request a song, or run `/request bsr` if you have a specific BSR code.
+
+
+

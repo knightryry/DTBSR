@@ -48,6 +48,7 @@ module.exports = {
         ),
     // this is where i start losing my mind again
     // holy hell complexity 56??? :sob:
+    // okay nvm its 26 lol
     async execute(interaction) {
         if (interaction.options.getSubcommand() === 'bsr') {
             const bsrCode = interaction.options.getString('code');
@@ -69,10 +70,11 @@ module.exports = {
             let mapKey = null;
             let mapUrl = null;
 
+            // turns out with the filters i just completely forgot to add it to the request lol
             try {
                 const response = await axios.get(
                     'https://api.beatsaver.com/search/text/0',
-                    { params: { q: searchTerm }, timeout: 4000 },
+                    { params: { q: searchTerm, chroma: interaction.options.getBoolean('chroma'), vivify: interaction.options.getBoolean('vivify'), noodle: interaction.options.getBoolean('noodle'), mappingextensions: interaction.options.getBoolean('mappingextensions') }, timeout: 4000 },
                 );
                 const maps = response.data.docs;
                 if (!maps || maps.length === 0) {
@@ -82,6 +84,8 @@ module.exports = {
 
                 // so turns out i have no fucking idea how to do filters, so were not gonna have it for now. im going insane its almost 4 in the morning
                 // also i spent an hour trying to figure out why it kept giving me an API error, turns out i forgot to remove the stupid broken filter stuff AGAIN.
+
+                // 4 am me 8 months ago was a fucking idiot lmao
 
                 // do this by user rating (not star) and grab the bsr code
                 maps.sort((a, b) => (b.stats.score || 0) - (a.stats.score || 0));
@@ -107,6 +111,7 @@ module.exports = {
                     content: `**Top Result:**\nTitle: ${mapTitle}\nAuthor: ${mapAuthor}\nBSR: ${mapKey}\n[View on BeatSaver](${mapUrl})\n\nDo you want to send this request to Twitch?`,
                     components: [row],
                     ephemeral: true,
+                    fetchReply: true
                 });
 
                 // wait for the user to actually do something for once.
@@ -136,7 +141,7 @@ module.exports = {
                 console.error('BeatSaver API error:', err);
                 let msg = 'Error searching BeatSaver API.';
                 if (err.response && err.response.status === 500) {
-                    msg += ' Error 500. BeatSaver may currently experiencing issues. Try again later.';
+                    msg += ' Error 500. either beatsaver is down or knightryry did some weird mistake';
                 }
                 else if (err.response && err.response.data) {
                     msg += ` (Status: ${err.response.status}) ${JSON.stringify(err.response.data)}`;

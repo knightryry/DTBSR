@@ -1,6 +1,8 @@
 // I only need to run this shitty code once, so whatever.
 const { REST, Routes } = require('discord.js');
-const { clientId, token, guildId } = require('./config.json');
+const clientId = process.env.clientId;
+const token = process.env.token;
+const guildId = process.env.guildId;
 const fs = require('node:fs');
 const path = require('node:path');
 

@@ -1,10 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
-
-const oauth = config.twitch_oauth;
-const nick = config.twitch_nick;
-const channel = config.twitch_channel;
+const oauth = process.env.twitch_oauth;
+const nick = process.env.twitch_nick;
+const channel = process.env.twitch_channel;
 
 const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
@@ -12,7 +8,7 @@ socket.addEventListener('open', () => {
     console.log('Connected to Twitch IRC');
     socket.send(`PASS oauth:${oauth}`);
     socket.send(`NICK ${nick}`);
-    socket.send(`JOIN ${channel}`);
+    socket.send(`JOIN #${channel}`);
 });
 
 socket.addEventListener('message', (event) => {
