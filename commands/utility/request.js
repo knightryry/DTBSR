@@ -52,11 +52,11 @@ module.exports = {
                 ),
         ),
     // this is where i start losing my mind again
-    // holy hell complexity 56??? :sob:
-    // okay nvm its 26 lol
+    // holy hell complexity 41 lol
+    //this async function is a fucking nightmare, but it works so whatever.
     async execute(interaction) {
         if (interaction.options.getSubcommand() === 'bsr') {
-            const bsrCode = interaction.options.getString('code');
+            let bsrCode = interaction.options.getString('code');
             const user = `@${interaction.user.username}`;
             if (bsrCode.startsWith('!bsr ')) {
                 bsrCode = bsrCode.slice(5);

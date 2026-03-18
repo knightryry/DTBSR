@@ -6,10 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
 const token = process.env.token;
-// why the hell do i have to import this here, i dont even use it in this file, but everything breaks if i dont, so here it will stay.
-// also PLEASE shut up eslint, i know this is a stupid import, but i need it to make the twitch requests work.
-// eslint-disable-next-line no-unused-vars
-const { sendToTwitch } = require('./twitch.js'); // This used to be in index.js but i moved it to a separate file because node js is extremely fucking stupid.
+const { sendToTwitch, initialize: initializeTwitch } = require('./twitch.js'); // This used to be in index.js but i moved it to a separate file because node js is extremely fucking stupid.
+// i finally made the import not stupid so eslint wont yell at me
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -36,6 +34,7 @@ for (const folder of commandFolders) {
 // this is a lie, as we only log on at the end of the file, but whatever, its fine.
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+	initializeTwitch();
 });
 
 client.on(Events.InteractionCreate, async interaction => {
