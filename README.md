@@ -15,10 +15,14 @@ Rename `template.env` to `.env` and then open it in a text editor, fill out all 
 - For the `token` and `clientId`, follow a bot creation guide for Discord and do the same things, make sure the bot is in the discord server of your choice.  
 - `twitch_channel` and `twitch_nick` will just be your twitch username  
 - For `twitch_oauth` go to [this site](https://antiscuff.com/oauth/), login with twitch and use that.  
+- `Guild ID` is optional, but is really good for fast command deployment, find how to get the guild ID of your server to find it.  
 
-Open the folder in a terminal and run `npm start` - the Discord bot should start.  
+Open the folder in a terminal and run `npm run deploy-commands` - the Discord bot should start. (Note that after running that for the first time, run `npm start` to start the bot.)  
+- It may take upto and *hour* to get the commands running (*psst!! if you want to bypass it make sure to fill out the Guild ID and it'll be instant for that server only*)
 
-Profit!!! Use `/request` to request a song, or run `/request bsr` if you have a specific BSR code.
+Profit!!! Use `/request` to request a song, or run `/request bsr` if you have a specific BSR code.  
+
+
 
 
 

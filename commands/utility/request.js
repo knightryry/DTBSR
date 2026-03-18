@@ -11,6 +11,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('request')
         .setDescription('Requests a song in my twitch chat, by BSR code or search for a map!')
+        .setContexts(0, 1, 2)
         .addSubcommand(sub =>
             sub.setName('bsr')
                 .setDescription('Request by BSR code (Only use if you know what youre doing.)')

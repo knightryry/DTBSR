@@ -1,4 +1,4 @@
-// I only need to run this shitty code once, so whatever.
+// i needed to run it more than once lol
 const { REST, Routes } = require('discord.js');
 const clientId = process.env.clientId;
 const token = process.env.token;
